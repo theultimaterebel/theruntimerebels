@@ -144,3 +144,11 @@ vite.config.ts.timestamp-*
 
 
 __pycache__
+
+# Python packaging and test artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+.pytest_cache/
+*.py[cod]
