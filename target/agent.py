@@ -6,7 +6,10 @@ from openai import OpenAI
 
 load_dotenv()
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), base_url=os.getenv("API_BASE_URL"))
+client = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    base_url=os.getenv("API_BASE_URL", "https://api.openai.com/v1"),
+)
 
 
 SYSTEM_PROMPT = """
