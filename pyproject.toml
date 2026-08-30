@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rootcheck"
+version = "0.1.0"
+requires-python = ">=3.11"
+
+dependencies = [
+    "mcp>=2,<3",
+    "openai",
+    "pydantic",
+    "python-dotenv"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"rootcheck.target" = ["files/*.txt"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[project.scripts]
+rootcheck-mcp = "rootcheck.mcp.server:main"
