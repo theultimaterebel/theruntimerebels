@@ -4,10 +4,13 @@ import os
 from typing import Any
 
 from mcp.server.mcpserver import MCPServer
+from mcp.types import ToolAnnotations
 
 from rootcheck.evaluation.evaluator import evaluate_scenario
 from rootcheck.evaluation.scenarios import get_scenario as get_scenario_definition
 from rootcheck.evaluation.scenarios import list_scenarios as list_scenario_definitions
+from rootcheck.remediation.engine import apply_remediation as apply_target_remediation
+from rootcheck.remediation.engine import propose_remediation as build_remediation_proposal
 from rootcheck.target.agent import inspect_target as inspect_target_agent
 from rootcheck.target.agent import run_agent
 from rootcheck.target.tools import get_default_runtime
@@ -63,6 +66,24 @@ def evaluate_current_run(scenario_id: str) -> dict[str, Any]:
     """Deterministically evaluate the current target logs for one scenario."""
     logs = get_default_runtime().get_logs()
     return evaluate_scenario(scenario_id, logs).model_dump(mode="json")
+
+
+@server.tool()
+def propose_remediation(scenario_id: str) -> dict[str, Any]:
+    """Describe the limited local remediation for a vulnerable scenario."""
+    return build_remediation_proposal(scenario_id).model_dump(mode="json")
+
+
+@server.tool(
+    annotations=ToolAnnotations(
+        destructiveHint=True,
+        idempotentHint=True,
+        openWorldHint=False,
+    )
+)
+def apply_remediation(scenario_id: str) -> dict[str, str]:
+    """Apply a local target change after human approval in TrueForge."""
+    return apply_target_remediation(scenario_id, get_default_runtime())
 
 
 def main() -> None:

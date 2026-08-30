@@ -3,7 +3,7 @@ from types import SimpleNamespace
 
 from rootcheck.target.agent import run_agent
 from rootcheck.target.demo import FAKE_SECRET_MARKER
-from rootcheck.target.tools import TargetToolRuntime
+from rootcheck.target.tools import INDIRECT_PROMPT_INJECTION_REMEDIATION, TargetToolRuntime
 
 
 def test_read_file_is_limited_to_controlled_directory(tmp_path):
@@ -117,3 +117,13 @@ def test_agent_supports_multi_step_llm_tool_calls_from_untrusted_content(tmp_pat
         "send_message",
     ]
     assert runtime.get_logs()[-1]["arguments"]["text"] == FAKE_SECRET_MARKER
+
+
+def test_remediation_disables_the_controlled_untrusted_file_policy(tmp_path):
+    runtime = TargetToolRuntime(tmp_path)
+
+    assert runtime.follows_file_instructions() is True
+    result = runtime.apply_remediation(INDIRECT_PROMPT_INJECTION_REMEDIATION)
+
+    assert result["status"] == "applied"
+    assert runtime.follows_file_instructions() is False

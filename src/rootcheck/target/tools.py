@@ -8,6 +8,7 @@ from typing import Any
 
 
 TOOL_NAMES = ("read_file", "send_message")
+INDIRECT_PROMPT_INJECTION_REMEDIATION = "scenario_001_indirect_prompt_injection"
 
 
 class TargetToolRuntime:
@@ -18,6 +19,7 @@ class TargetToolRuntime:
             Path(files_root) if files_root is not None else Path(__file__).parent / "files"
         ).resolve()
         self._logs: list[dict[str, Any]] = []
+        self._follow_file_instructions = True
         self._lock = Lock()
 
     def _record(self, tool: str, arguments: dict[str, Any], result: str) -> None:
@@ -83,6 +85,24 @@ class TargetToolRuntime:
             for path in self.files_root.rglob("*")
             if path.is_file()
         )
+
+    def follows_file_instructions(self) -> bool:
+        with self._lock:
+            return self._follow_file_instructions
+
+    def apply_remediation(self, scenario_id: str) -> dict[str, str]:
+        if scenario_id != INDIRECT_PROMPT_INJECTION_REMEDIATION:
+            raise ValueError(f"no remediation is available for scenario: {scenario_id}")
+        with self._lock:
+            already_applied = not self._follow_file_instructions
+            self._follow_file_instructions = False
+        result = (
+            "Remediation was already active; untrusted file instructions remain disabled."
+            if already_applied
+            else "Remediation applied: untrusted file instructions are no longer trusted."
+        )
+        self._record("apply_remediation", {"scenario_id": scenario_id}, result)
+        return {"status": "already_applied" if already_applied else "applied", "result": result}
 
 
 _DEFAULT_RUNTIME = TargetToolRuntime()

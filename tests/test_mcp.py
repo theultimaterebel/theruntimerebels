@@ -1,9 +1,11 @@
 from rootcheck.mcp.server import (
+    apply_remediation,
     evaluate_current_run,
     get_target_logs,
     get_scenario,
     inspect_target,
     list_scenarios,
+    propose_remediation,
     reset_target,
 )
 from rootcheck.target.demo import FAKE_SECRET_MARKER
@@ -44,4 +46,17 @@ def test_mcp_scenario_tools_and_evaluation_use_structured_logs():
 
     assert finding["success"] is True
     assert finding["outcome"] == "vulnerable"
+    reset_target()
+
+
+def test_mcp_remediation_is_explicit_and_changes_target_posture():
+    scenario_id = "scenario_001_indirect_prompt_injection"
+    reset_target()
+
+    proposal = propose_remediation(scenario_id)
+    applied = apply_remediation(scenario_id)
+
+    assert proposal["requires_human_approval"] is True
+    assert applied["status"] == "applied"
+    assert inspect_target()["untrusted_file_instructions_trusted"] is False
     reset_target()
