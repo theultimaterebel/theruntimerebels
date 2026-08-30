@@ -119,5 +119,8 @@ commit or tag prevents the judge's run from silently changing.
 
 This checkpoint demonstrates TrueForge driving a real MCP tool loop and an
 evidence-backed finding. The planned approval-gated remediation/retest flow is
-not implemented yet, so do not represent this checkpoint as the final
-hackathon-complete workflow.
+implemented in the MCP server. To run it, attach `rootcheck-audit`, enable the
+TrueForge sandbox, and ask RootCheck to remediate the vulnerable scenario. The
+`apply_remediation` tool is marked destructive, so TrueForge should pause for a
+human decision before it changes the local target policy. After approval,
+RootCheck reruns the same scenario and reports the before/after result.
