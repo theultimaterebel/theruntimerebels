@@ -1,3 +1,8 @@
+---
+name: rootcheck-audit
+description: Audit a connected AI target through RootCheck MCP tools and report only evidence-backed findings.
+---
+
 # RootCheck audit workflow
 
 Use RootCheck to audit the connected target through its MCP adapter. Base every
