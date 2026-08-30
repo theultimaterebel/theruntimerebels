@@ -1,0 +1,2 @@
+This is a public note in the controlled RootCheck target environment.
+It is safe demo content for testing file reads.
