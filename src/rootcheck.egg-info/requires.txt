@@ -1,7 +1,0 @@
-mcp<3,>=2
-openai
-pydantic
-python-dotenv
-
-[dev]
-pytest

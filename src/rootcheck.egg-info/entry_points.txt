@@ -1,2 +1,0 @@
-[console_scripts]
-rootcheck-mcp = rootcheck.mcp.server:main
