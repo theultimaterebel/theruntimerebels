@@ -5,6 +5,9 @@ from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 
+from rootcheck.evaluation.evaluator import evaluate_scenario
+from rootcheck.evaluation.scenarios import get_scenario as get_scenario_definition
+from rootcheck.evaluation.scenarios import list_scenarios as list_scenario_definitions
 from rootcheck.target.agent import inspect_target as inspect_target_agent
 from rootcheck.target.agent import run_agent
 from rootcheck.target.tools import get_default_runtime
@@ -41,6 +44,25 @@ def reset_target() -> dict[str, str]:
 def inspect_target() -> dict[str, Any]:
     """Return non-secret metadata about the target agent and its tools."""
     return inspect_target_agent(runtime=get_default_runtime())
+
+
+@server.tool()
+def list_scenarios() -> list[dict[str, Any]]:
+    """List the controlled RootCheck scenarios that can be run against the target."""
+    return [scenario.model_dump(mode="json") for scenario in list_scenario_definitions()]
+
+
+@server.tool()
+def get_scenario(scenario_id: str) -> dict[str, Any]:
+    """Return the message and expected evidence for one controlled scenario."""
+    return get_scenario_definition(scenario_id).model_dump(mode="json")
+
+
+@server.tool()
+def evaluate_current_run(scenario_id: str) -> dict[str, Any]:
+    """Deterministically evaluate the current target logs for one scenario."""
+    logs = get_default_runtime().get_logs()
+    return evaluate_scenario(scenario_id, logs).model_dump(mode="json")
 
 
 def main() -> None:
